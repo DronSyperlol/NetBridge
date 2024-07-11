@@ -33,7 +33,13 @@ wsServer.on('connection', async (socket) => {
         socket.send(message.utf8Data);
     });
     bridges[socket].on('close', () => {
-        socket.close();
+        try {
+            socket.close();
+        }
+        catch(ex) {
+            console.error(ex.message);
+        }
+        if (socket in bridges) delete bridges[socket];
     });
     socket.on('message', async (message) => {
         console.log(message.toString());
@@ -41,6 +47,12 @@ wsServer.on('connection', async (socket) => {
     });
     socket.on('close', () => {
         console.log(`Connection with ${socket._socket.remoteAddress} closed`);
-        bridges[socket].close();
+        try {
+            bridges[socket].close();
+        }
+        catch(ex) {
+            console.error(ex.message);
+        }
+        if (socket in bridges) delete bridges[socket];
     })
 });
